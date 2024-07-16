@@ -740,7 +740,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
     /**
      Starts recording a video with or without voice as in the session preset.
      */
-    open func startRecordingVideo() {
+    open func startRecordingVideo(toURL url: URL? = nil) {
         guard cameraOutputMode != .stillImage else {
             _show(NSLocalizedString("Capture session output still image", comment: ""), message: NSLocalizedString("I can only take pictures", comment: ""))
             return
@@ -772,7 +772,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
 
         _updateIlluminationMode(flashMode)
         
-        videoOutput.startRecording(to: _tempFilePath(), recordingDelegate: self)
+        videoOutput.startRecording(to: url ?? _tempFilePath(), recordingDelegate: self)
     }
     
     /**
