@@ -88,12 +88,19 @@ cameraManager.stopVideoRecording({ (videoURL, recordError) -> Void in
 })
 ```
 
-To zoom in manually:
+To zoom manually:
 
 ```swift
+// Zoom in
 let zoomScale = CGFloat(2.0)
 cameraManager.zoom(zoomScale)
+
+// Zoom out (ultra-wide, 0.5x - supported on newer cameras)
+let zoomScale = CGFloat(0.5)
+cameraManager.zoom(zoomScale)
 ```
+
+The zoom range is 0.5x to the device's maximum zoom factor. Ultra-wide zoom (0.5x) is available on newer camera devices that support it.
 
 ### Properties
 
