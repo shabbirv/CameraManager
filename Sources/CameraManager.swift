@@ -971,7 +971,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
             let captureDevice = device
             try captureDevice?.lockForConfiguration()
             
-            zoomScale = max(1.0, min(beginZoomScale * scale, maxZoomScale))
+            zoomScale = max(minZoomScale, min(beginZoomScale * scale, maxZoomScale))
             
             captureDevice?.videoZoomFactor = zoomScale
             
@@ -1541,15 +1541,19 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
     
     fileprivate func _setupMaxZoomScale() {
         var maxZoom = CGFloat(1.0)
+        var minZoom = CGFloat(1.0)
         beginZoomScale = CGFloat(1.0)
         
         if cameraDevice == .back, let backCameraDevice = backCameraDevice {
             maxZoom = backCameraDevice.activeFormat.videoMaxZoomFactor
+            minZoom = backCameraDevice.minAvailableVideoZoomFactor
         } else if cameraDevice == .front, let frontCameraDevice = frontCameraDevice {
             maxZoom = frontCameraDevice.activeFormat.videoMaxZoomFactor
+            minZoom = frontCameraDevice.minAvailableVideoZoomFactor
         }
         
         maxZoomScale = maxZoom
+        minZoomScale = minZoom
     }
     
     fileprivate func _checkIfCameraIsAvailable() -> CameraState {
