@@ -260,7 +260,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
                 _updateCameraDevice(cameraDevice)
                 _updateIlluminationMode(flashMode)
                 _setupMaxZoomScale()
-                _zoom(0)
+                _zoom(1)
                 _orientationChanged()
             }
         }
@@ -292,7 +292,7 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
                     _setupOutputMode(cameraOutputMode, oldCameraOutputMode: oldValue)
                 }
                 _setupMaxZoomScale()
-                _zoom(0)
+                _zoom(1)
             }
         }
     }
@@ -1562,18 +1562,40 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
     fileprivate func _setupMaxZoomScale() {
         var maxZoom = CGFloat(1.0)
         var minZoom = CGFloat(1.0)
+        var defaultZoom = CGFloat(1.0)
         beginZoomScale = CGFloat(1.0)
 
         if cameraDevice == .back, let backCameraDevice = backCameraDevice {
             maxZoom = backCameraDevice.activeFormat.videoMaxZoomFactor
             minZoom = backCameraDevice.minAvailableVideoZoomFactor
+
+            // For multi-camera devices, start at the first switchover point (main wide-angle camera)
+            // This represents "1x" zoom in the Camera app
+            if #available(iOS 13.0, *),
+               let switchOverFactors = backCameraDevice.virtualDeviceSwitchOverVideoZoomFactors as? [CGFloat],
+               let firstSwitchOver = switchOverFactors.first {
+                defaultZoom = firstSwitchOver
+            } else {
+                defaultZoom = minZoom
+            }
         } else if cameraDevice == .front, let frontCameraDevice = frontCameraDevice {
             maxZoom = frontCameraDevice.activeFormat.videoMaxZoomFactor
             minZoom = frontCameraDevice.minAvailableVideoZoomFactor
+
+            // For multi-camera front devices, start at the first switchover point
+            if #available(iOS 13.0, *),
+               let switchOverFactors = frontCameraDevice.virtualDeviceSwitchOverVideoZoomFactors as? [CGFloat],
+               let firstSwitchOver = switchOverFactors.first {
+                defaultZoom = firstSwitchOver
+            } else {
+                defaultZoom = minZoom
+            }
         }
 
         maxZoomScale = maxZoom
         minZoomScale = minZoom
+        zoomScale = defaultZoom
+        beginZoomScale = defaultZoom
     }
     
     fileprivate func _checkIfCameraIsAvailable() -> CameraState {
