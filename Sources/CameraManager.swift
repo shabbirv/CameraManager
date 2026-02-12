@@ -348,7 +348,26 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
     }()
     
     fileprivate lazy var backCameraDevice: AVCaptureDevice? = {
-        AVCaptureDevice.videoDevices.filter { $0.position == .back }.first
+        // Try to get multi-camera virtual devices first (supports ultra-wide)
+        var deviceTypes: [AVCaptureDevice.DeviceType] = [.builtInWideAngleCamera]
+
+        if #available(iOS 13.0, *) {
+            // Prefer virtual devices that support multiple cameras including ultra-wide
+            deviceTypes = [
+                .builtInTripleCamera,      // iPhone 11 Pro, 12 Pro, 13 Pro, 14 Pro, etc.
+                .builtInDualWideCamera,    // iPhone 11, 13, 14 (wide + ultra-wide)
+                .builtInDualCamera,        // iPhone 7 Plus, 8 Plus, X, XS (wide + telephoto)
+                .builtInWideAngleCamera    // Fallback for single camera devices
+            ]
+        }
+
+        let discoverySession = AVCaptureDevice.DiscoverySession(
+            deviceTypes: deviceTypes,
+            mediaType: .video,
+            position: .back
+        )
+
+        return discoverySession.devices.first
     }()
     
     fileprivate lazy var mic: AVCaptureDevice? = {

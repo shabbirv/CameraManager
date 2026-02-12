@@ -100,7 +100,14 @@ let zoomScale = CGFloat(1.0)
 cameraManager.zoom(zoomScale)
 ```
 
-The zoom range is automatically determined by the device's camera capabilities using `minAvailableVideoZoomFactor` and `maxAvailableVideoZoomFactor`. On devices with ultra-wide cameras (iPhone 11+), setting zoom to 1.0 will use the ultra-wide lens.
+The zoom range is automatically determined by the device's camera capabilities using `minAvailableVideoZoomFactor` and `maxAvailableVideoZoomFactor`.
+
+**Ultra-Wide Camera Support:**
+The library automatically detects and uses multi-camera virtual devices (iPhone 11+) that include ultra-wide lenses:
+- iPhone 11 Pro/12 Pro/13 Pro/14 Pro: `.builtInTripleCamera` (ultra-wide + wide + telephoto)
+- iPhone 11/13/14: `.builtInDualWideCamera` (ultra-wide + wide)
+
+On these devices, setting zoom to 1.0 automatically uses the ultra-wide lens. iOS handles the camera switching seamlessly as you zoom in and out.
 
 ### Properties
 
