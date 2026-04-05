@@ -691,9 +691,13 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
         _updateIlluminationMode(flashMode)
         
         sessionQueue.async {
+            guard let session = self.captureSession, session.isRunning else {
+                imageCompletion(.failure(CaptureError.noVideoConnection))
+                return
+            }
             let stillImageOutput = self._getStillImageOutput()
             if let connection = stillImageOutput.connection(with: AVMediaType.video),
-                connection.isEnabled {
+                connection.isEnabled, connection.isActive {
                 if self.cameraDevice == CameraDevice.front, connection.isVideoMirroringSupported,
                     self.shouldFlipFrontCameraImage {
                     connection.isVideoMirrored = true
