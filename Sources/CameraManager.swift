@@ -1260,9 +1260,13 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
         
         _setupVideoConnection()
         
-        if let captureSession = captureSession, captureSession.canAddOutput(newMovieOutput) {
+        if let captureSession = captureSession,
+            captureSession.isRunning,
+            captureSession.canAddOutput(newMovieOutput) {
             captureSession.beginConfiguration()
-            captureSession.addOutput(newMovieOutput)
+            if captureSession.canAddOutput(newMovieOutput) {
+                captureSession.addOutput(newMovieOutput)
+            }
             captureSession.commitConfiguration()
         }
     }
@@ -1295,9 +1299,12 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
         let newStillImageOutput = AVCaptureStillImageOutput()
         stillImageOutput = newStillImageOutput
         if let captureSession = captureSession,
+            captureSession.isRunning,
             captureSession.canAddOutput(newStillImageOutput) {
             captureSession.beginConfiguration()
-            captureSession.addOutput(newStillImageOutput)
+            if captureSession.canAddOutput(newStillImageOutput) {
+                captureSession.addOutput(newStillImageOutput)
+            }
             captureSession.commitConfiguration()
         }
         return newStillImageOutput
