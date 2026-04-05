@@ -485,7 +485,8 @@ open class CameraManager: NSObject, AVCaptureFileOutputRecordingDelegate, UIGest
     open func resumeCaptureSession() {
         if let validCaptureSession = captureSession {
             if !validCaptureSession.isRunning, cameraIsSetup {
-                sessionQueue.async {
+                sessionQueue.async { [weak self] in
+                    guard let self = self, self.captureSession === validCaptureSession, self.cameraIsSetup else { return }
                     validCaptureSession.startRunning()
                     self._startFollowingDeviceOrientation()
                 }
